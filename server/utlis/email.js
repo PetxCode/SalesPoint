@@ -63,7 +63,7 @@ const orderRecieved = async (email, puchaseToken) => {
     const mailOptions = {
       from: "no-reply✉️  <d1churchnetwork@gmail.com>",
       to: email,
-      subject: "Account Verification",
+      subject: "Bread Puchase",
       html: ` <h3>
             Thank you for Purchasing with us... Here is your purchase ID: ${puchaseToken}
         </h3>`,

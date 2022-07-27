@@ -10,6 +10,12 @@ const userModel = mongoose.Schema(
     password: {
       type: String,
     },
+    address: {
+      type: String,
+    },
+    phoneNumb: {
+      type: Number,
+    },
     order: [
       {
         type: mongoose.Schema.Types.ObjectId,

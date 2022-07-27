@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const crypto = require("crypto");
 const { purchaseOrder } = require("../utlis/email");
 const jwt = require("jsonwebtoken");
+const orderItemsModel = require("../model/orderItemsModel");
 
 const getUsers = async (req, res) => {
   try {
@@ -26,10 +27,16 @@ const getUser = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    const { userName, email, password } = req.body;
+    const { userName, email, password, address, phoneNumb } = req.body;
     const salt = await bcrypt.genSalt(10);
     const hasked = await bcrypt.hash(password, salt);
-    const users = await userModel.create({ userName, email, password: hasked });
+    const users = await userModel.create({
+      userName,
+      email,
+      password: hasked,
+      phoneNumb,
+      address,
+    });
     res.status(200).json({ mesage: "found users", data: users });
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -38,7 +45,7 @@ const createUser = async (req, res) => {
 
 const createAdminUser = async (req, res) => {
   try {
-    const { userName, email, password } = req.body;
+    const { userName, email, password, address, phoneNumb } = req.body;
     const salt = await bcrypt.genSalt(10);
     const hasked = await bcrypt.hash(password, salt);
     const users = await userModel.create({
@@ -46,6 +53,8 @@ const createAdminUser = async (req, res) => {
       email,
       password: hasked,
       isAdmin: true,
+      address,
+      phoneNumb,
     });
     res.status(200).json({ mesage: "found users", data: users });
   } catch (error) {
@@ -96,14 +105,28 @@ const createOrder = async (req, res) => {
 
     const getUser = await userModel.findById(req.params.id);
 
-    // res.status(200).json({ message: "order registered", data: getUser });
+    const orderIFiles = await orderItemsModel.insertMany({
+      title,
+      description,
+      price,
+      type,
+    });
 
-    const order = new orderModel({
-      who: getUsers.userName,
+    // res.status(200).json({ message: "order registered", data: orderIFiles });
+
+    const token = crypto.randomBytes(6).toString("hex");
+
+    const order = await orderModel.create({
+      who: getUser.userName,
       phoneNumb: getUser.phoneNumb,
       address: getUser.address,
       seen: false,
       delivered: false,
+      orderToken: token,
+
+      orderItem: orderIFiles,
+
+      // orderItem: { $push: { orderIFiles } },
     });
 
     order.user = getUser;
@@ -111,8 +134,6 @@ const createOrder = async (req, res) => {
 
     getUser.order.push(mongoose.Types.ObjectId(order._id));
     getUser.save();
-
-    const token = crypto.randomBytes(6).toString("hex");
 
     purchaseOrder(getUser.email, token)
       .then((result) => {
@@ -122,7 +143,7 @@ const createOrder = async (req, res) => {
         res.status(404).json({ messageData: err });
       });
 
-    // res.status(200).json({ message: "order registered", data: order });
+    res.status(200).json({ message: "order registered", data: order });
   } catch (err) {
     res.status(404).json({ message: err.message });
   }

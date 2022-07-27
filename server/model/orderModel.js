@@ -6,22 +6,25 @@ const orderModel = mongoose.Schema(
       type: String,
     },
 
+    orderToken: {
+      type: String,
+    },
+
     address: {
       type: String,
     },
     phoneNumb: {
-      type: String,
+      type: Number,
     },
     seen: {
-      type: Number,
+      type: Boolean,
     },
     delievered: {
-      type: Number,
+      type: Boolean,
     },
     orderItem: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "orderItems",
+        type: Object,
       },
     ],
   },

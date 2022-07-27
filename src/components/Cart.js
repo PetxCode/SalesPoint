@@ -14,6 +14,18 @@ const CartScreen = () => {
     });
   };
 
+  const postData = async () => {
+    await axios
+      .post(
+        `http://localhost:2331/api/user/62df0d9f9ec24dc27b31cfb0/order`,
+        data
+      )
+      .then((res) => {
+        // setData(res.data.data);
+        console.log("Added: ", data);
+      });
+  };
+
   useEffect(() => {
     getData();
   }, []);
@@ -42,6 +54,7 @@ const CartScreen = () => {
             </MainCard>
           ))}
         </Card>
+        <Button onClick={postData}>Add to Cart</Button>
       </Wrapper>
     </Container>
   );

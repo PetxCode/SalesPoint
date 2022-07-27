@@ -12,6 +12,7 @@ const orderItemModel = mongoose.Schema(
     type: {
       type: String,
     },
+
     price: {
       type: Number,
     },
